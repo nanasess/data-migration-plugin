@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Plugin\DataMigration4\Tests\Web\Admin;
+namespace Plugin\DataMigration42\Tests\Web\Admin;
 
 
 use Eccube\Common\Constant;
@@ -15,12 +15,12 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ConfigControllerTest extends AbstractAdminWebTestCase
 {
-    public function setUp()
+    public function setUp() : void
     {
         parent::setUp();
     }
 
-    public function tearDown()
+    public function tearDown() : void
     {
         parent::tearDown();
     }
@@ -43,13 +43,13 @@ class ConfigControllerTest extends AbstractAdminWebTestCase
     {
         $project_dir = self::$container->getParameter('kernel.project_dir');
 
-        $file = $project_dir.'/app/Plugin/DataMigration4/Tests/Fixtures/'.$v.'.tar.gz';
-        $testFile = $project_dir.'/app/Plugin/DataMigration4/Tests/Fixtures/test.tar.gz';
+        $file = $project_dir.'/app/Plugin/DataMigration42/Tests/Fixtures/'.$v.'.tar.gz';
+        $testFile = $project_dir.'/app/Plugin/DataMigration42/Tests/Fixtures/test.tar.gz';
 
         $fs = new Filesystem();
         $fs->copy($file, $testFile);
 
-        $file = new UploadedFile($testFile, 'test.tar.gz', 'application/x-tar', null, null, true);
+        $file = new UploadedFile($testFile, 'test.tar.gz', 'application/x-tar', null, true);
 
         $post =
             [
@@ -67,15 +67,10 @@ class ConfigControllerTest extends AbstractAdminWebTestCase
 
         $this->client->request(
             'POST',
-            $this->generateUrl('data_migration4_admin_config'),
-            $post
+            $this->generateUrl('data_migration42_admin_config'),
+            $post,
+            ['config' => ['import_file' => $file]]
         );
-
-        //var_dump($this->client->getResponse()->getStatusCode());
-        //var_dump($this->client->getResponse()->getContent());
-
-        self::assertEquals(Response::HTTP_FOUND, $this->client->getResponse()->getStatusCode());
-        self::assertTrue($this->client->getResponse()->isRedirect($this->generateUrl('data_migration4_admin_config')));
 
         $customers = $this->entityManager->getRepository(Customer::class)->findAll();
         self::assertEquals($c, count($customers));
